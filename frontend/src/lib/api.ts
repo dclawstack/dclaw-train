@@ -1,34 +1,33 @@
-export interface Training {
-  id: string;
-  name: string;
-  format: string;
-  enrollment_link: string;
-  completion_rate: number;
-  average_score: number;
-  certification_expiry: string;
-  created_at: string;
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+
+class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
 }
 
-export interface LearnerProgress {
-  learner_name: string;
-  status: string;
-  score: number;
-}
-
-export async function api<T>(
-  path: string,
-  init?: RequestInit
-): Promise<T> {
-  const res = await fetch(`/api/v1${path}`, {
-    ...init,
+async function fetchJson<T>(path: string, options?: RequestInit): Promise<T> {
+  const url = `${API_BASE}${path}`;
+  const response = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
-      ...(init?.headers || {}),
+      ...options?.headers,
     },
+    ...options,
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`API error ${res.status}: ${text}`);
+  if (!response.ok) {
+    const error = await response.text();
+    throw new ApiError(`API error ${response.status}: ${error}`, response.status);
   }
-  return res.json() as Promise<T>;
+  return response.json();
 }
+
+export async function getHealth() {
+  return fetchJson<{ status: string }>("/health/");
+}
+
+// TODO: Add app-specific API functions here
+
+export { ApiError };
