@@ -5,8 +5,8 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "DClaw App",
-  description: "DClaw vertical SaaS application",
+  title: "DClaw Train — AI-Powered LMS",
+  description: "Employee training & certification tracking on the DClaw Stack",
 }
 
 export default function RootLayout({
