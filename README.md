@@ -1,59 +1,136 @@
-# DClaw Scaffold
+# DClaw Train
 
-> **The single source of truth for new DClaw app development.**
-> Clone this repo, rename it, fill in your `PRODUCT-SPEC.md`, and hand it to your coding agents.
+> **Employee Training & LMS Platform** — AI-powered learning management built on the DClaw Stack.
+>
+> **Author:** Ramsai Kamavaram — [kamavaram.ramsai@gmail.com](mailto:kamavaram.ramsai@gmail.com)
 
-## What This Is
+**Category:** L&D · **Version:** 0.1.0 · **Status:** Active Development
+**Backend Port:** `8039` (FastAPI) · **Frontend Port:** `3039` (Next.js) · **Database:** `dclaw_train` (PostgreSQL)
 
-This scaffold contains the **complete boilerplate** for any DClaw vertical SaaS app:
-- ✅ FastAPI backend with correct SQLAlchemy 2.0 setup
-- ✅ Next.js 14 frontend with Tailwind + pre-built UI components
-- ✅ Docker + docker-compose with working healthchecks
-- ✅ Helm chart for Kubernetes deployment
-- ✅ Alembic migrations setup
-- ✅ pytest test harness with pinned pytest-asyncio==0.24.0
-- ✅ GitHub Actions CI
-- ✅ `AGENTS.md` + `PLAN-v1.2.md` templates
-- ✅ Pre-built UI components (no shadcn CLI needed)
+---
 
-## How to Use
+## Features
+
+### v1.0 — Core LMS (Current)
+
+- [x] Course & library CRUD — create, organize, and manage training courses
+- [x] Lesson & video content management — structured lessons with rich media
+- [x] Learner progress tracking — per-user completion and time-spent tracking
+- [x] Quiz & assessment builder — manual quiz creation with varied question types
+- [x] Real backend CRUD — no mock data; everything persisted to PostgreSQL
+- [x] Docker + Helm deployment — containerized with Kubernetes support
+- [x] Alembic migrations — version-controlled database schema
+- [x] Backend tests — pytest with async SQLAlchemy test fixtures
+
+### P0 — Must Have (v1.2)
+
+- [ ] **AI Learning Copilot (Tutor Bot)** — 24/7 AI tutor using RAG over course content. Socratic-style Q&A, context-aware per lesson. Floating chat widget in lesson view.
+- [ ] **Course Builder & Content Management** — Drag-and-drop visual course builder with rich text editing, video upload/transcoding, and resource attachments.
+- [ ] **AI-Generated Quizzes & Assessments** — LLM-powered auto-generation of questions with distractors from course transcripts. One-click add to lessons.
+- [ ] **Learner Progress & Analytics** — Completion tracking, time spent, engagement scoring. At-risk learner identification. Manager reporting dashboard.
+
+### P1 — Should Have (v1.1–v1.2)
+
+- [ ] **AI-Powered Personalized Learning Paths** — Smart recommendations based on role, skills gaps, and career goals.
+- [ ] **Live Session & Webinar Management** — Scheduling, reminders, recording, and auto-transcription (Whisper). Zoom/Jitsi integration.
+- [ ] **Certification & Badges** — PDF certificate generation on completion. Gamified badge system for achievements.
+- [ ] **Skills Assessment & Gap Analysis** — Pre/post assessments with radar-chart skill-gap visualization.
+
+### P2 — Could Have (v1.3+)
+
+- [ ] **AI Video Summarization & Chapters** — Auto-generated summaries, chapter markers, and searchable transcripts.
+- [ ] **Peer Learning & Discussion Forums** — Course-specific forums with AI moderation and Q&A.
+- [ ] **SCORM/xAPI Compliance** — Import/export SCORM packages. Track learning experiences via xAPI.
+- [ ] **VR/AR Training Simulations** — Immersive scenarios for high-stakes roles (medical, safety, technical).
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Backend** | FastAPI + SQLAlchemy 2.0 (async) + Pydantic v2 |
+| **Frontend** | Next.js 14 (App Router) + Tailwind CSS |
+| **Database** | PostgreSQL (via `dclaw_train`) |
+| **AI/ML** | RAG pipeline, LLM integration (tutor bot, quiz gen, summarization) |
+| **Infra** | Docker, docker-compose, Helm (Kubernetes) |
+| **CI/CD** | GitHub Actions |
+| **Migrations** | Alembic (async) |
+
+---
+
+## Getting Started
 
 ```bash
-# 1. Clone the scaffold
-git clone https://github.com/dclawstack/dclaw-scaffold.git dclaw-YOURAPP
-cd dclaw-YOURAPP
+# Clone
+git clone <repo-url> dclaw-train
+cd dclaw-train
 
-# 2. Find/replace placeholders
-# {APP_NAME}    -> Your app name (e.g., CRM)
-# {BACKEND_PORT}-> Next free port (see port registry below)
-# {FRONTEND_PORT}-> Next free port
-# {DB_NAME}     -> dclaw_yourapp
+# Start services
+docker compose up -d
 
-# 3. Write your PRODUCT-SPEC.md
-# See PRODUCT-SPEC.md.template for the format
-
-# 4. Hand to your coding agents
-# See SCALING-PLAYBOOK.md for the parallel agent workflow
+# Backend runs on http://localhost:8039
+# Frontend runs on http://localhost:3039
+# API docs at http://localhost:8039/docs
 ```
 
-## Critical Rules for Agents
+### Environment
 
-### DO NOT install shadcn CLI
-The scaffold includes pre-built UI components in `frontend/src/components/ui/`. Installing `shadcn` v4 or `@base-ui/react` will break the Tailwind v3 build.
+Copy `.env.example` to `.env` and configure:
+- `DATABASE_URL` — PostgreSQL connection string
+- `NEXT_PUBLIC_API_URL` — Backend URL for the frontend (default: `http://localhost:8039/api/v1`)
 
-### DO NOT change the Postgres test port
-`backend/tests/conftest.py` uses `localhost:5432`. GitHub Actions CI maps the Postgres service to port 5432. Changing this breaks CI.
+---
 
-### DO NOT delete `.github/workflows/ci.yml`
-This file is required for GitHub Actions to run tests on every push.
+## Architecture Lock (Do Not Change)
 
-### DO NOT upgrade pytest-asyncio
-Keep `pytest-asyncio==0.24.0` pinned in `requirements.txt`. v1.3.0 breaks fixture scoping.
+These patterns are non-negotiable across all DClaw apps:
+
+| Rule | Reason |
+|------|--------|
+| **`DeclarativeBase` from `app.models.base`** | Single metadata source; no `declarative_base()` elsewhere |
+| **`Mapped[...]` + `mapped_column()`** | SQLAlchemy 2.0 typed model syntax |
+| **`Depends(get_db)` for DI** | Never manually instantiate `AsyncSession` |
+| **Repository pattern** | All DB access through `app/repositories/` |
+| **No mock data** | No in-memory dicts; always real DB |
+| **Pydantic v2** `ConfigDict(from_attributes=True)` | ORM mode for schemas |
+| **`pytest-asyncio==0.24.0` pinned** | v1.3.0 breaks fixture scoping |
+| **Pre-built UI components only** | Never install shadcn CLI or `@base-ui/react` |
+| **`ARG NEXT_PUBLIC_API_URL` in Dockerfile** | Required before `npm run build` |
+
+---
+
+## Project Structure
+
+```
+Train/
+├── backend/
+│   ├── app/
+│   │   ├── api/v1/           # App-specific routers
+│   │   ├── core/             # config.py, database.py
+│   │   ├── models/           # SQLAlchemy models (Base from models/base.py)
+│   │   ├── repositories/     # CRUD layer
+│   │   ├── schemas/          # Pydantic v2 schemas
+│   │   └── services/         # Business logic + AI services
+│   ├── alembic/              # Database migrations
+│   └── tests/                # pytest (async, ASGITransport)
+├── frontend/
+│   ├── src/
+│   │   ├── app/              # Next.js App Router pages
+│   │   ├── components/ui/    # Pre-built UI components
+│   │   └── lib/              # api.ts, utils.ts
+│   └── Dockerfile
+├── docker-compose.yml
+├── helm/                     # Kubernetes chart
+└── .github/workflows/ci.yml  # CI pipeline
+```
+
+---
 
 ## Port Registry
 
-| App | Backend Port | Frontend Port | Database |
-|-----|-------------|---------------|----------|
+| App | Backend | Frontend | Database |
+|-----|---------|----------|----------|
 | dclaw-chat | 8090 | 3000 | dclaw_chat |
 | dclaw-med | 8092 | 3004 | dclaw_med |
 | dclaw-learn | 8093 | 3003 | dclaw_learn |
@@ -62,34 +139,23 @@ Keep `pytest-asyncio==0.24.0` pinned in `requirements.txt`. v1.3.0 breaks fixtur
 | dclaw-crm | 8095 | 3006 | dclaw_crm |
 | dclaw-finance | 8096 | 3007 | dclaw_finance |
 | dclaw-hr | 8097 | 3008 | dclaw_hr |
-| **TBD #9** | **8098** | **3009** | **dclaw_xxx** |
-| **TBD #10** | **8100** | **3010** | **dclaw_xxx** |
+| dclaw-inventory | 8098 | 3009 | dclaw_inventory |
+| dclaw-project | 8100 | 3010 | dclaw_project |
+| dclaw-support | 8101 | 3014 | dclaw_support |
+| dclaw-marketing | 8102 | 3015 | dclaw_marketing |
+| dclaw-real-estate | 8103 | 3016 | dclaw_real_estate |
+| dclaw-sales | 8104 | 3017 | dclaw_sales |
+| dclaw-recruit | 8105 | 3018 | dclaw_recruit |
+| dclaw-vendor | 8106 | 3019 | dclaw_vendor |
+| dclaw-doc | 8107 | 3020 | dclaw_doc |
+| dclaw-calendar | 8108 | 3021 | dclaw_calendar |
+| **dclaw-train** | **8039** | **3039** | **dclaw_train** |
 
-> **Rule:** New apps take the next available port. Update this table when assigning.
+---
 
-## Files You Must Customize
+## Author
 
-| File | What to Change |
-|------|---------------|
-| `backend/app/core/config.py` | `app_name`, default database name |
-| `backend/app/api/main.py` | Wire v1 routers |
-| `frontend/package.json` | Package name |
-| `frontend/src/app/layout.tsx` | Title, description |
-| `frontend/src/app/page.tsx` | Dashboard content |
-| `docker-compose.yml` | Port mappings |
-| `helm/Chart.yaml` | Chart name |
-| `helm/values.yaml` | Image repository names |
-| `AGENTS.md` | App identity, port numbers |
-| `PLAN-v1.2.md` | Feature backlog |
-| `PRODUCT-SPEC.md` | (Create this) Domain models, business logic |
+**Ramsai Kamavaram**  
+📧 [kamavaram.ramsai@gmail.com](mailto:kamavaram.ramsai@gmail.com)
 
-## What You Should NOT Change
-
-- `app/models/base.py` — `DeclarativeBase` pattern
-- `app/core/database.py` — Engine/session factory
-- `docker-compose.yml` healthcheck commands
-- `frontend/Dockerfile` `ARG NEXT_PUBLIC_API_URL` pattern
-- `tests/conftest.py` — Test DB override pattern (keep `localhost:5432`)
-- `frontend/src/components/ui/*.tsx` — Pre-built components (use as-is)
-- `requirements.txt` — Keep `pytest-asyncio==0.24.0` pinned
-- `.github/workflows/ci.yml` — Do not delete
+Built on the [DClaw Stack](https://github.com/dclawstack) — AI-first vertical SaaS infrastructure.
