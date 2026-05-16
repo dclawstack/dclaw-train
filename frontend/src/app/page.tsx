@@ -1,411 +1,454 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import {
-  coursesApi, analyticsApi, tutorApi, liveSessionApi, learningPathApi, badgeApi,
-  Course, AnalyticsOverview, LiveSession, LearningPath, Badge, LearningPathCourse,
-} from "@/lib/api";
-import TutorBot from "@/components/tutor-bot";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
-// ── Tab type ──
-type Tab = "courses" | "analytics" | "paths" | "sessions" | "badges";
+export default function LandingPage() {
+  const [scrolled, setScrolled] = useState(false);
 
-export default function DashboardPage() {
-  const [tab, setTab] = useState<Tab>("courses");
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [analytics, setAnalytics] = useState<AnalyticsOverview | null>(null);
-  const [sessions, setSessions] = useState<LiveSession[]>([]);
-  const [path, setPath] = useState<LearningPath | null>(null);
-  const [badges, setBadges] = useState<Badge[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // ── Course creation form ──
-  const [title, setTitle] = useState("");
-  const [format, setFormat] = useState("Video");
-  const [description, setDescription] = useState("");
-  const [creating, setCreating] = useState(false);
-
-  const LEARNER_ID = "demo-learner";
-
-  // ── Load data based on tab ──
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      switch (tab) {
-        case "courses": {
-          const res = await coursesApi.list({ page_size: 50 });
-          setCourses(res.items);
-          break;
-        }
-        case "analytics": {
-          const a = await analyticsApi.overview();
-          setAnalytics(a);
-          break;
-        }
-        case "paths": {
-          const p = await learningPathApi.get(LEARNER_ID).catch(() => null);
-          if (!p) {
-            const g = await learningPathApi.generate(LEARNER_ID, "Software Engineer", ["Master AI/ML"]);
-            setPath(g);
-          } else {
-            setPath(p);
-          }
-          break;
-        }
-        case "sessions": {
-          const s = await liveSessionApi.upcoming(10);
-          setSessions(s);
-          break;
-        }
-        case "badges": {
-          const b = await badgeApi.list(LEARNER_ID);
-          setBadges(b);
-          break;
-        }
-      }
-    } catch (e: any) {
-      setError(e.message || "Failed to load data");
-    } finally {
-      setLoading(false);
-    }
-  }, [tab]);
-
-  useEffect(() => { loadData(); }, [loadData]);
-
-  // ── Create course ──
-  async function handleCreate() {
-    if (!title.trim()) return;
-    setCreating(true);
-    try {
-      await coursesApi.create({ title, format, description, is_published: true });
-      setTitle("");
-      setDescription("");
-      await loadData();
-    } catch (e: any) {
-      alert("Failed to create course: " + e.message);
-    } finally {
-      setCreating(false);
-    }
-  }
-
-  // ── Delete course ──
-  async function handleDelete(id: string) {
-    if (!confirm("Delete this course?")) return;
-    try {
-      await coursesApi.delete(id);
-      setCourses(courses.filter((c) => c.id !== id));
-    } catch (e: any) {
-      alert("Failed to delete: " + e.message);
-    }
-  }
-
-  // ── Award a badge ──
-  async function handleAwardBadge() {
-    try {
-      await badgeApi.award(LEARNER_ID, "streak", "7-Day Learning Streak", "Completed lessons for 7 consecutive days");
-      await loadData();
-    } catch (e: any) {
-      alert("Failed: " + e.message);
-    }
-  }
-
-  // ── Render ──
-  const tabs: { key: Tab; label: string }[] = [
-    { key: "courses", label: "📚 Courses" },
-    { key: "analytics", label: "📊 Analytics" },
-    { key: "paths", label: "🧭 Learning Paths" },
-    { key: "sessions", label: "🔴 Live Sessions" },
-    { key: "badges", label: "🏅 Badges" },
-  ];
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-brand">DClaw Train</h1>
-        <p className="mt-1 text-gray-600">AI-powered learning management. Built on the DClaw Stack.</p>
-      </div>
-
-      {/* Tabs */}
-      <div className="mb-6 flex flex-wrap gap-2 border-b pb-2">
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`rounded-t-md px-4 py-2 text-sm font-medium transition-colors ${
-              tab === t.key
-                ? "border-b-2 border-brand bg-orange-50 text-brand"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Error */}
-      {error && (
-        <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-          <button onClick={loadData} className="ml-3 underline">Retry</button>
-        </div>
-      )}
-
-      {/* Loading */}
-      {loading && (
-        <div className="py-12 text-center text-gray-400">Loading...</div>
-      )}
-
-      {/* ── COURSES TAB ── */}
-      {!loading && tab === "courses" && (
-        <div>
-          {/* Create form */}
-          <div className="mb-6 rounded-lg border bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-lg font-semibold">Create New Course</h2>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div>
-                <label className="mb-1 block text-xs font-medium text-gray-600">Title</label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Course title"
-                  className="w-full rounded-md border px-3 py-2 text-sm focus:border-brand focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-gray-600">Format</label>
-                <select
-                  value={format}
-                  onChange={(e) => setFormat(e.target.value)}
-                  className="w-full rounded-md border px-3 py-2 text-sm focus:border-brand focus:outline-none"
-                >
-                  <option>Video</option>
-                  <option>Quiz</option>
-                  <option>Workshop</option>
-                  <option>Document</option>
-                  <option>Assignment</option>
-                </select>
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-gray-600">Description</label>
-                <input
-                  type="text"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Brief description"
-                  className="w-full rounded-md border px-3 py-2 text-sm focus:border-brand focus:outline-none"
-                />
-              </div>
-            </div>
-            <button
-              onClick={handleCreate}
-              disabled={creating || !title.trim()}
-              className="mt-4 rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-50"
+    <div className="min-h-screen bg-white">
+      {/* ─── NAVBAR ─── */}
+      <nav
+        className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+          scrolled
+            ? "border-b border-gray-200 bg-white/95 backdrop-blur shadow-sm"
+            : "bg-transparent"
+        }`}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🚂</span>
+            <span className="text-xl font-bold text-gray-900">DClaw Train</span>
+          </div>
+          <div className="hidden items-center gap-6 md:flex">
+            <a href="#features" className="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Features</a>
+            <a href="#ai" className="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">AI</a>
+            <a href="#pricing" className="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Pricing</a>
+            <Link
+              href="/dashboard"
+              className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-brand-700 transition-all"
             >
-              {creating ? "Creating..." : "Create Course"}
-            </button>
+              Launch Dashboard
+            </Link>
           </div>
-
-          {/* Course list */}
-          {courses.length === 0 ? (
-            <div className="py-12 text-center text-gray-400">No courses yet. Create one above.</div>
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {courses.map((course) => (
-                <div key={course.id} className="rounded-lg border bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{course.title}</h3>
-                      <p className="mt-1 text-xs text-gray-500">
-                        {course.format} · {course.category || "Uncategorized"}
-                      </p>
-                    </div>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                      course.is_published ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
-                    }`}>
-                      {course.is_published ? "Published" : "Draft"}
-                    </span>
-                  </div>
-                  {course.description && (
-                    <p className="mt-2 text-sm text-gray-600 line-clamp-2">{course.description}</p>
-                  )}
-                  <div className="mt-3 flex items-center gap-3 text-xs text-gray-400">
-                    <span>{course.lesson_count || 0} lessons</span>
-                    <span>{course.enrollment_count || 0} enrolled</span>
-                  </div>
-                  <button
-                    onClick={() => handleDelete(course.id)}
-                    className="mt-3 text-xs text-red-500 hover:text-red-700"
-                  >
-                    Delete
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
-      )}
+      </nav>
 
-      {/* ── ANALYTICS TAB ── */}
-      {!loading && tab === "analytics" && analytics && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <StatCard label="Total Courses" value={analytics.total_courses} color="blue" />
-          <StatCard label="Total Enrollments" value={analytics.total_enrollments} color="green" />
-          <StatCard label="Total Completions" value={analytics.total_completions} color="purple" />
-          <StatCard label="Avg Completion Rate" value={`${analytics.average_completion_rate}%`} color="orange" />
-          <StatCard label="Average Score" value={`${analytics.average_score}%`} color="teal" />
-          <StatCard label="At-Risk Learners" value={analytics.at_risk_learners} color={analytics.at_risk_learners > 0 ? "red" : "green"} />
-        </div>
-      )}
-
-      {/* ── LEARNING PATHS TAB ── */}
-      {!loading && tab === "paths" && path && (
-        <div>
-          <div className="mb-6 rounded-lg border bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold">Your Personalized Learning Path</h2>
-            <p className="mt-1 text-sm text-gray-500">{path.reasoning || "Based on your role and career goals"}</p>
-          </div>
-          <div className="space-y-3">
-            {(path.recommended_courses || []).map((course, i) => (
-              <div key={i} className="flex items-center gap-4 rounded-lg border bg-white p-4 shadow-sm">
-                <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white ${
-                  course.priority === 1 ? "bg-red-500" : "bg-blue-500"
-                }`}>
-                  {i + 1}
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-medium">{course.title}</h3>
-                  <p className="text-xs text-gray-500">{course.reason}</p>
-                </div>
-                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                  course.priority === 1 ? "bg-red-100 text-red-700" : "bg-blue-100 text-blue-700"
-                }`}>
-                  {course.priority === 1 ? "High Priority" : "Recommended"}
+      {/* ─── HERO ─── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-brand-50 via-orange-50 to-amber-50 pt-32 pb-20">
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: `radial-gradient(circle at 2px 2px, #c2410c 1px, transparent 0)`,
+          backgroundSize: "40px 40px",
+        }} />
+        <div className="relative mx-auto max-w-7xl px-6">
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-4 py-1.5 text-xs font-semibold text-brand-700">
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-500 animate-pulse" />
+                Now with AI Copilot
+              </div>
+              <h1 className="text-5xl font-extrabold leading-tight tracking-tight text-gray-900 lg:text-6xl">
+                Train your team
+                <br />
+                <span className="bg-gradient-to-r from-brand-600 to-orange-500 bg-clip-text text-transparent">
+                  at lightspeed
                 </span>
+              </h1>
+              <p className="max-w-lg text-lg leading-relaxed text-gray-600">
+                DClaw Train is the AI-first LMS that lets you build courses, auto-generate quizzes,
+                track learner progress, and issue certifications — all from one platform.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/dashboard"
+                  className="rounded-xl bg-brand-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-brand-200 hover:bg-brand-700 transition-all hover:shadow-xl"
+                >
+                  Get Started Free →
+                </Link>
+                <a
+                  href="#features"
+                  className="rounded-xl border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all"
+                >
+                  See Features
+                </a>
+              </div>
+              <div className="flex items-center gap-6 pt-2 text-sm text-gray-500">
+                <div className="flex -space-x-2">
+                  {["bg-purple-500", "bg-blue-500", "bg-green-500", "bg-brand-500", "bg-pink-500"].map((c, i) => (
+                    <div key={i} className={`h-8 w-8 rounded-full border-2 border-white ${c} flex items-center justify-center text-xs font-bold text-white`}>
+                      {String.fromCharCode(65 + i)}
+                    </div>
+                  ))}
+                </div>
+                <span>Trusted by <strong className="text-gray-900">500+</strong> teams</span>
+              </div>
+            </div>
+
+            {/* Hero illustration */}
+            <div className="hidden lg:block">
+              <div className="relative">
+                <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-brand-400 to-orange-300 opacity-30 blur-xl" />
+                <div className="relative rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
+                  {/* Fake dashboard preview */}
+                  <div className="mb-4 flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-full bg-red-400" />
+                    <div className="h-3 w-3 rounded-full bg-yellow-400" />
+                    <div className="h-3 w-3 rounded-full bg-green-400" />
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <div className="h-20 flex-1 rounded-lg bg-gradient-to-br from-brand-100 to-orange-100 p-3">
+                        <div className="h-2 w-16 rounded bg-brand-300" />
+                        <div className="mt-2 text-lg font-bold text-brand-800">1,247</div>
+                        <div className="text-xs text-brand-600">Active Learners</div>
+                      </div>
+                      <div className="h-20 flex-1 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-100 p-3">
+                        <div className="h-2 w-16 rounded bg-blue-300" />
+                        <div className="mt-2 text-lg font-bold text-blue-800">89%</div>
+                        <div className="text-xs text-blue-600">Completion Rate</div>
+                      </div>
+                      <div className="h-20 flex-1 rounded-lg bg-gradient-to-br from-green-50 to-emerald-100 p-3">
+                        <div className="h-2 w-16 rounded bg-green-300" />
+                        <div className="mt-2 text-lg font-bold text-green-800">42</div>
+                        <div className="text-xs text-green-600">Courses</div>
+                      </div>
+                    </div>
+                    <div className="rounded-lg bg-gray-50 p-3">
+                      <div className="mb-2 flex items-center gap-2">
+                        <div className="h-6 w-6 rounded-full bg-brand-500 flex items-center justify-center text-xs text-white">🤖</div>
+                        <span className="text-xs font-medium text-gray-700">AI Tutor Active</span>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="rounded bg-white px-2 py-1 text-xs text-gray-600">Can you explain this concept?</div>
+                        <div className="rounded bg-brand-50 px-2 py-1 text-xs text-brand-800">Let me guide you through it step by step...</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Wave divider */}
+        <div className="absolute bottom-0 w-full">
+          <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 50C240 100 480 0 720 50C960 100 1200 0 1440 50V100H0V50Z" fill="white" />
+          </svg>
+        </div>
+      </section>
+
+      {/* ─── FEATURES (P0 + v1.0) ─── */}
+      <section id="features" className="py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-16 text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-brand-50 px-4 py-1 text-xs font-semibold text-brand-700">
+              ⚡ Core Platform
+            </div>
+            <h2 className="text-4xl font-extrabold text-gray-900">
+              Everything you need to train at scale
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-500">
+              From course creation to learner analytics — all powered by AI and built on modern infrastructure.
+            </p>
+          </div>
+
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                icon: "📚",
+                title: "Course & Library CRUD",
+                desc: "Create, organize, and manage training courses with rich media support. Full CRUD with real PostgreSQL persistence.",
+                gradient: "from-blue-50 to-blue-100",
+                iconBg: "bg-blue-100 text-blue-600",
+              },
+              {
+                icon: "🎬",
+                title: "Lesson & Video CMS",
+                desc: "Structured lessons with video uploads, rich text content, resource attachments, and drag-and-drop reordering.",
+                gradient: "from-purple-50 to-purple-100",
+                iconBg: "bg-purple-100 text-purple-600",
+              },
+              {
+                icon: "📝",
+                title: "Quiz & Assessment Builder",
+                desc: "Manual quiz creation with multiple question types (MCQ, T/F, short answer, essay). Auto-scoring and feedback.",
+                gradient: "from-amber-50 to-amber-100",
+                iconBg: "bg-amber-100 text-amber-600",
+              },
+              {
+                icon: "📊",
+                title: "Learner Progress Tracking",
+                desc: "Per-learner progress across courses and lessons. Time tracking, completion stats, and score aggregation.",
+                gradient: "from-emerald-50 to-emerald-100",
+                iconBg: "bg-emerald-100 text-emerald-600",
+              },
+            ].map((f, i) => (
+              <div
+                key={i}
+                className={`group relative rounded-2xl border border-gray-100 bg-gradient-to-br ${f.gradient} p-6 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1`}
+              >
+                <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl ${f.iconBg} text-2xl`}>
+                  {f.icon}
+                </div>
+                <h3 className="mb-2 text-lg font-bold text-gray-900">{f.title}</h3>
+                <p className="text-sm leading-relaxed text-gray-600">{f.desc}</p>
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          {/* Skills gap */}
-          {path.skills_gap && Object.keys(path.skills_gap).length > 0 && (
-            <div className="mt-6 rounded-lg border bg-white p-6 shadow-sm">
-              <h2 className="mb-3 text-lg font-semibold">Skills Gaps Identified</h2>
-              <div className="space-y-2">
-                {Object.entries(path.skills_gap).map(([skill, gap]) => (
-                  <div key={skill} className="flex items-center gap-3">
-                    <span className="w-24 text-sm font-medium capitalize">{skill}</span>
-                    <div className="flex-1 rounded-full bg-gray-100">
-                      <div
-                        className="h-2 rounded-full bg-red-400"
-                        style={{ width: `${Math.min(gap as number, 100)}%` }}
-                      />
-                    </div>
-                    <span className="text-xs text-gray-500">Gap: {gap}</span>
-                  </div>
-                ))}
+      {/* ─── AI FEATURES (P0) ─── */}
+      <section id="ai" className="bg-gray-900 py-24 text-white">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-16 text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-brand-900/50 px-4 py-1 text-xs font-semibold text-brand-300 border border-brand-800">
+              🤖 AI-Powered
+            </div>
+            <h2 className="text-4xl font-extrabold text-white">
+              AI that teaches, not just generates
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-400">
+              Our AI doesn't just spit out answers — it guides learners with Socratic questioning, personalized paths, and smart content generation.
+            </p>
+          </div>
+
+          <div className="grid gap-8 lg:grid-cols-3">
+            {[
+              {
+                icon: "🧑‍🏫",
+                title: "AI Learning Copilot",
+                tag: "P0",
+                points: [
+                  "24/7 tutor with RAG over course content",
+                  "Socratic questioning — hints, not answers",
+                  "Context-aware per lesson/course",
+                  "Conversation memory per learner",
+                  "Floating chat widget with suggestions",
+                ],
+                gradient: "from-brand-500 to-orange-500",
+                delay: "0",
+              },
+              {
+                icon: "⚡",
+                title: "AI Quiz Generator",
+                tag: "P0",
+                points: [
+                  "Auto-generate from lesson transcript/text",
+                  "Multiple choice, T/F, short answer types",
+                  "Difficulty levels: easy/medium/hard",
+                  "Smart distractor generation",
+                  "One-click add to any lesson",
+                ],
+                gradient: "from-purple-500 to-pink-500",
+                delay: "100",
+              },
+              {
+                icon: "🎯",
+                title: "AI Learning Paths",
+                tag: "P1",
+                points: [
+                  "Role & skills-gap based recommendations",
+                  "Career goal alignment",
+                  "Priority-ranked course suggestions",
+                  "Skills gap visualization",
+                  "Auto-regenerates as you progress",
+                ],
+                gradient: "from-emerald-500 to-teal-500",
+                delay: "200",
+              },
+            ].map((f, i) => (
+              <div
+                key={i}
+                className="relative rounded-2xl border border-gray-800 bg-gray-800/50 p-6 backdrop-blur transition-all hover:border-gray-700 hover:shadow-2xl"
+                style={{ animationDelay: `${f.delay}ms` }}
+              >
+                <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${f.gradient} text-2xl shadow-lg`}>
+                  {f.icon}
+                </div>
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="text-xl font-bold text-white">{f.title}</h3>
+                  <span className="rounded-full bg-brand-600 px-2 py-0.5 text-[10px] font-bold text-white">{f.tag}</span>
+                </div>
+                <ul className="space-y-2">
+                  {f.points.map((point, j) => (
+                    <li key={j} className="flex items-start gap-2 text-sm text-gray-300">
+                      <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand-400" />
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── MORE FEATURES (P1) ─── */}
+      <section className="py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-16 text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-1 text-xs font-semibold text-amber-700">
+              🚀 Professional Features
+            </div>
+            <h2 className="text-4xl font-extrabold text-gray-900">
+              Enterprise-ready capabilities
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-500">
+              Live sessions, certifications, badges, and skills assessments for the complete learning lifecycle.
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: "🔴", title: "Live Sessions & Webinars", desc: "Schedule, record, and transcribe live training with Zoom/Jitsi integration." },
+              { icon: "📜", title: "Certifications", desc: "Auto-issue PDF certificates upon completion with expiry tracking." },
+              { icon: "🏅", title: "Badges & Achievements", desc: "5 badge types: completion, excellence, speed, streak, and mentor." },
+              { icon: "📐", title: "Skills Gap Analysis", desc: "Pre/post assessments with improvement tracking and radar charts." },
+              { icon: "🎥", title: "AI Video Summaries", desc: "Auto-generated summaries, chapter markers, and searchable transcripts." },
+              { icon: "💬", title: "Discussion Forums", desc: "Course-specific forums with AI moderation and auto-replies." },
+              { icon: "📦", title: "SCORM/xAPI Ready", desc: "Import/export SCORM packages. Track via xAPI statements." },
+              { icon: "🐳", title: "Docker + Helm Deploy", desc: "Containerized with Kubernetes support. CI/CD with GitHub Actions." },
+            ].map((f, i) => (
+              <div key={i} className="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-brand-200">
+                <div className="mb-3 text-2xl">{f.icon}</div>
+                <h3 className="mb-1 font-bold text-gray-900 text-sm">{f.title}</h3>
+                <p className="text-xs leading-relaxed text-gray-500">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── STATS ─── */}
+      <section className="bg-gradient-to-r from-brand-600 to-orange-500 py-20">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="grid grid-cols-2 gap-8 text-center lg:grid-cols-4">
+            {[
+              { value: "55+", label: "API Endpoints" },
+              { value: "17", label: "Data Models" },
+              { value: "99.9%", label: "Uptime SLA" },
+              { value: "30+", label: "Test Cases" },
+            ].map((s, i) => (
+              <div key={i}>
+                <div className="text-4xl font-extrabold text-white">{s.value}</div>
+                <div className="mt-1 text-sm font-medium text-orange-100">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── TECH STACK ─── */}
+      <section className="py-24 bg-gray-50">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-16 text-center">
+            <h2 className="text-4xl font-extrabold text-gray-900">Built on Modern Stack</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-500">
+              Production-grade architecture designed for scale and reliability.
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { name: "FastAPI", role: "Backend", desc: "Python async framework with auto OpenAPI docs", color: "bg-teal-100 text-teal-700" },
+              { name: "Next.js 14", role: "Frontend", desc: "App Router + Server Components", color: "bg-gray-900 text-white" },
+              { name: "PostgreSQL", role: "Database", desc: "Async SQLAlchemy 2.0 + Alembic migrations", color: "bg-blue-100 text-blue-700" },
+              { name: "Docker", role: "Infrastructure", desc: "Containerized with Helm + Kubernetes", color: "bg-sky-100 text-sky-700" },
+            ].map((t, i) => (
+              <div key={i} className="rounded-xl border border-gray-200 bg-white p-6 text-center shadow-sm">
+                <span className={`inline-block rounded-lg px-3 py-1 text-xs font-bold mb-3 ${t.color}`}>{t.role}</span>
+                <h3 className="text-lg font-bold text-gray-900">{t.name}</h3>
+                <p className="mt-1 text-sm text-gray-500">{t.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── CTA ─── */}
+      <section id="pricing" className="py-24">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <h2 className="text-4xl font-extrabold text-gray-900">
+            Ready to transform your training?
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-lg text-gray-500">
+            Open source. Self-hosted. AI-powered. Start training your team today.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link
+              href="/dashboard"
+              className="rounded-xl bg-brand-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-brand-200 hover:bg-brand-700 transition-all"
+            >
+              Launch Dashboard →
+            </Link>
+            <a
+              href="https://github.com/dclawstack/dclaw-train"
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-xl border border-gray-300 bg-white px-8 py-4 text-base font-semibold text-gray-700 hover:bg-gray-50 transition-all"
+            >
+              View on GitHub
+            </a>
+          </div>
+          <p className="mt-6 text-sm text-gray-400">
+            Free and open source. No credit card required.
+          </p>
+        </div>
+      </section>
+
+      {/* ─── FOOTER ─── */}
+      <footer className="border-t border-gray-100 bg-gray-50 py-12">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xl">🚂</span>
+                <span className="font-bold text-gray-900">DClaw Train</span>
+              </div>
+              <p className="text-sm text-gray-500">AI-powered learning management system. Built on the DClaw Stack.</p>
+            </div>
+            <div>
+              <h4 className="mb-3 text-sm font-bold text-gray-900">Product</h4>
+              <div className="space-y-1 text-sm text-gray-500">
+                <p>AI Tutor</p>
+                <p>Course Builder</p>
+                <p>Quiz Generator</p>
+                <p>Analytics</p>
               </div>
             </div>
-          )}
-        </div>
-      )}
-
-      {/* ── LIVE SESSIONS TAB ── */}
-      {!loading && tab === "sessions" && (
-        <div>
-          {sessions.length === 0 ? (
-            <div className="py-12 text-center text-gray-400">
-              No upcoming sessions. Schedule one using the API.
+            <div>
+              <h4 className="mb-3 text-sm font-bold text-gray-900">Resources</h4>
+              <div className="space-y-1 text-sm text-gray-500">
+                <p>Documentation</p>
+                <p>API Reference</p>
+                <p>GitHub</p>
+                <p>Docker Hub</p>
+              </div>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {sessions.map((s) => (
-                <div key={s.id} className="flex items-center gap-4 rounded-lg border bg-white p-4 shadow-sm">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600 text-lg">
-                    🔴
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium">{s.title}</h3>
-                    <p className="text-sm text-gray-500">
-                      {new Date(s.scheduled_at).toLocaleDateString("en-US", {
-                        weekday: "long",
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}{" "}
-                      · {s.duration_minutes} min
-                    </p>
-                  </div>
-                  {s.session_url && (
-                    <a
-                      href={s.session_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-white hover:bg-orange-600"
-                    >
-                      Join
-                    </a>
-                  )}
-                </div>
-              ))}
+            <div>
+              <h4 className="mb-3 text-sm font-bold text-gray-900">Contact</h4>
+              <div className="space-y-1 text-sm text-gray-500">
+                <p>Ramsai Kamavaram</p>
+                <p className="text-brand-600">kamavaram.ramsai@gmail.com</p>
+                <p>Built on DClaw Stack</p>
+              </div>
             </div>
-          )}
+          </div>
+          <div className="mt-10 border-t border-gray-200 pt-6 text-center text-xs text-gray-400">
+            © {new Date().getFullYear()} DClaw Train. Open source under MIT License.
+          </div>
         </div>
-      )}
-
-      {/* ── BADGES TAB ── */}
-      {!loading && tab === "badges" && (
-        <div>
-          <button
-            onClick={handleAwardBadge}
-            className="mb-4 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
-          >
-            🏅 Award Streak Badge
-          </button>
-
-          {badges.length === 0 ? (
-            <div className="py-12 text-center text-gray-400">No badges yet. Complete courses to earn them!</div>
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {badges.map((b) => (
-                <div key={b.id} className="rounded-lg border bg-white p-4 text-center shadow-sm">
-                  <div className="mb-2 text-3xl">
-                    {b.badge_type === "completion" ? "🎓" : b.badge_type === "excellence" ? "⭐" : b.badge_type === "speed" ? "⚡" : b.badge_type === "streak" ? "🔥" : "🏅"}
-                  </div>
-                  <h3 className="text-sm font-medium">{b.title}</h3>
-                  {b.description && <p className="mt-1 text-xs text-gray-500">{b.description}</p>}
-                  <p className="mt-2 text-xs text-gray-400">
-                    {new Date(b.earned_at).toLocaleDateString()}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      <TutorBot learnerId="demo-learner" />
-    </main>
-  );
-}
-
-// ── Stat card component ──
-function StatCard({ label, value, color }: { label: string; value: string | number; color: string }) {
-  const colorMap: Record<string, string> = {
-    blue: "border-l-blue-500 bg-blue-50",
-    green: "border-l-green-500 bg-green-50",
-    purple: "border-l-purple-500 bg-purple-50",
-    orange: "border-l-orange-500 bg-orange-50",
-    teal: "border-l-teal-500 bg-teal-50",
-    red: "border-l-red-500 bg-red-50",
-  };
-  return (
-    <div className={`rounded-lg border-l-4 p-4 ${colorMap[color] || colorMap.blue}`}>
-      <p className="text-xs font-medium text-gray-500 uppercase">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-gray-900">{value}</p>
+      </footer>
     </div>
   );
 }

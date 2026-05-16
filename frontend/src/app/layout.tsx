@@ -6,7 +6,13 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "DClaw Train — AI-Powered LMS",
-  description: "Employee training & certification tracking on the DClaw Stack",
+  description: "Employee training & certification tracking. AI tutor, course builder, quiz generator, analytics, and more.",
+  keywords: ["LMS", "AI training", "employee learning", "course builder", "quiz generator"],
+  openGraph: {
+    title: "DClaw Train — AI-Powered LMS",
+    description: "Train your team at lightspeed. AI tutor, course builder, quiz generator, analytics, and more.",
+    type: "website",
+  },
 }
 
 export default function RootLayout({
