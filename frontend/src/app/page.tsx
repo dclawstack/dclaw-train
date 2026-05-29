@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import DemoControls from "@/components/demo-controls";
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -145,6 +146,10 @@ export default function LandingPage() {
           </svg>
         </div>
       </section>
+
+      {/* DEMO CONTROLS — remove this block + the import to drop the demo feature */}
+      <DemoControls />
+      {/* END DEMO CONTROLS */}
 
       {/* ─── FEATURES (P0 + v1.0) ─── */}
       <section id="features" className="py-24">

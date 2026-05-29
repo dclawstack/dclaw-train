@@ -1,5 +1,0 @@
-apiVersion: v2
-name: dclaw-train
-description: Employee training & certification tracking
-version: 0.1.0
-appVersion: 0.1.0

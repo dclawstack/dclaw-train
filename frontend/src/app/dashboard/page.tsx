@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import {
   coursesApi, analyticsApi, liveSessionApi, learningPathApi, badgeApi,
   Course, AnalyticsOverview, LiveSession, LearningPath, Badge,
@@ -114,9 +115,17 @@ export default function DashboardPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-brand-600">DClaw Train Dashboard</h1>
-        <p className="mt-1 text-gray-500">AI-powered LMS · Manage courses, track learners, and analyze progress.</p>
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-brand-600">DClaw Train Dashboard</h1>
+          <p className="mt-1 text-gray-500">AI-powered LMS · Manage courses, track learners, and analyze progress.</p>
+        </div>
+        <Link
+          href="/courses/builder"
+          className="shrink-0 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-brand-700"
+        >
+          🛠️ Course Builder
+        </Link>
       </div>
 
       <div className="mb-6 flex flex-wrap gap-2 border-b pb-2">

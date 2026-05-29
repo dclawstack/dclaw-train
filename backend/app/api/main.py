@@ -31,3 +31,7 @@ app.include_router(health.router, prefix="/health", tags=["health"])
 
 from app.api.v1.train import router as train_router
 app.include_router(train_router, prefix="/api/v1", tags=["v1"])
+
+# DEMO feature (removable) — see backend/app/api/v1/demo.py header.
+from app.api.v1.demo import router as demo_router
+app.include_router(demo_router, prefix="/api/v1", tags=["demo"])

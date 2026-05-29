@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     secret_key: str = "change-me-in-production"
     access_token_expire_minutes: int = 60
 
+    # Demo mode — gates the removable /api/v1/demo/* seed endpoints.
+    enable_demo_mode: bool = False
+
     class Config:
         env_file = ".env"
         case_sensitive = False
