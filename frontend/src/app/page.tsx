@@ -2,458 +2,571 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import DemoControls from "@/components/demo-controls";
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const handle = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", handle);
+    return () => window.removeEventListener("scroll", handle);
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* ─── NAVBAR ─── */}
-      <nav
-        className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-          scrolled
-            ? "border-b border-gray-200 bg-white/95 backdrop-blur shadow-sm"
-            : "bg-transparent"
-        }`}
-      >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🚂</span>
-            <span className="text-xl font-bold text-gray-900">DClaw Train</span>
-          </div>
-          <div className="hidden items-center gap-6 md:flex">
-            <a href="#features" className="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Features</a>
-            <a href="#ai" className="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">AI</a>
-            <a href="#pricing" className="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Pricing</a>
-            <Link
-              href="/dashboard"
-              className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-brand-700 transition-all"
-            >
-              Launch Dashboard
-            </Link>
-          </div>
+    <div style={{ background: "#05060f", color: "#e2e8f0", fontFamily: "'Inter', sans-serif", overflowX: "hidden" }}>
+
+      {/* ── NAVBAR ── */}
+      <nav style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+        padding: "0 2rem",
+        height: "64px",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        background: scrolled ? "rgba(5,6,15,0.85)" : "transparent",
+        backdropFilter: scrolled ? "blur(20px)" : "none",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
+        transition: "all 0.3s ease",
+      }}>
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 8,
+            background: "linear-gradient(135deg, #f97316, #fb923c)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 16, boxShadow: "0 0 20px rgba(249,115,22,0.4)",
+          }}>🚂</div>
+          <span style={{ fontWeight: 700, fontSize: "1rem", color: "#fff", letterSpacing: "-0.02em" }}>
+            DClaw <span style={{ color: "#fb923c" }}>Train</span>
+          </span>
+        </Link>
+
+        <div style={{ display: "flex", gap: "2rem" }}>
+          {["Features", "AI", "Enterprise", "Pricing"].map((l) => (
+            <a key={l} href={`#${l.toLowerCase()}`} style={{
+              color: "#94a3b8", fontSize: "0.875rem", fontWeight: 500,
+              textDecoration: "none", transition: "color 0.2s",
+            }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#f1f5f9")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#94a3b8")}
+            >{l}</a>
+          ))}
+        </div>
+
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <Link href="/dashboard" style={{
+            color: "#94a3b8", fontSize: "0.875rem", fontWeight: 500,
+            textDecoration: "none", padding: "6px 14px",
+          }}>Sign In</Link>
+          <Link href="/dashboard" style={{
+            background: "linear-gradient(135deg, #ea580c, #f97316)",
+            color: "#fff", fontWeight: 600, fontSize: "0.875rem",
+            padding: "8px 20px", borderRadius: "8px", textDecoration: "none",
+            boxShadow: "0 0 24px rgba(249,115,22,0.35)",
+            transition: "box-shadow 0.2s",
+          }}>Get Started →</Link>
         </div>
       </nav>
 
-      {/* ─── HERO ─── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-brand-50 via-orange-50 to-amber-50 pt-32 pb-20">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, #c2410c 1px, transparent 0)`,
-          backgroundSize: "40px 40px",
+      {/* ── HERO ── */}
+      <section style={{
+        minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
+        textAlign: "center", padding: "120px 1.5rem 80px",
+        position: "relative", overflow: "hidden",
+      }}>
+        {/* Dot grid */}
+        <div style={{
+          position: "absolute", inset: 0, opacity: 0.18,
+          backgroundImage: "radial-gradient(circle, #334155 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
         }} />
-        <div className="relative mx-auto max-w-7xl px-6">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-4 py-1.5 text-xs font-semibold text-brand-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-500 animate-pulse" />
-                Now with AI Copilot
-              </div>
-              <h1 className="text-5xl font-extrabold leading-tight tracking-tight text-gray-900 lg:text-6xl">
-                Train your team
-                <br />
-                <span className="bg-gradient-to-r from-brand-600 to-orange-500 bg-clip-text text-transparent">
-                  at lightspeed
-                </span>
-              </h1>
-              <p className="max-w-lg text-lg leading-relaxed text-gray-600">
-                DClaw Train is the AI-first LMS that lets you build courses, auto-generate quizzes,
-                track learner progress, and issue certifications — all from one platform.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/dashboard"
-                  className="rounded-xl bg-brand-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-brand-200 hover:bg-brand-700 transition-all hover:shadow-xl"
-                >
-                  Get Started Free →
-                </Link>
-                <a
-                  href="#features"
-                  className="rounded-xl border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all"
-                >
-                  See Features
-                </a>
-              </div>
-              <div className="flex items-center gap-6 pt-2 text-sm text-gray-500">
-                <div className="flex -space-x-2">
-                  {["bg-purple-500", "bg-blue-500", "bg-green-500", "bg-brand-500", "bg-pink-500"].map((c, i) => (
-                    <div key={i} className={`h-8 w-8 rounded-full border-2 border-white ${c} flex items-center justify-center text-xs font-bold text-white`}>
-                      {String.fromCharCode(65 + i)}
-                    </div>
-                  ))}
-                </div>
-                <span>Trusted by <strong className="text-gray-900">500+</strong> teams</span>
-              </div>
-            </div>
+        {/* Orange glow orb top-center */}
+        <div style={{
+          position: "absolute", top: "-100px", left: "50%", transform: "translateX(-50%)",
+          width: "600px", height: "600px", borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }} />
 
-            {/* Hero illustration */}
-            <div className="hidden lg:block">
-              <div className="relative">
-                <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-brand-400 to-orange-300 opacity-30 blur-xl" />
-                <div className="relative rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
-                  {/* Fake dashboard preview */}
-                  <div className="mb-4 flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-full bg-red-400" />
-                    <div className="h-3 w-3 rounded-full bg-yellow-400" />
-                    <div className="h-3 w-3 rounded-full bg-green-400" />
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <div className="h-20 flex-1 rounded-lg bg-gradient-to-br from-brand-100 to-orange-100 p-3">
-                        <div className="h-2 w-16 rounded bg-brand-300" />
-                        <div className="mt-2 text-lg font-bold text-brand-800">1,247</div>
-                        <div className="text-xs text-brand-600">Active Learners</div>
-                      </div>
-                      <div className="h-20 flex-1 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-100 p-3">
-                        <div className="h-2 w-16 rounded bg-blue-300" />
-                        <div className="mt-2 text-lg font-bold text-blue-800">89%</div>
-                        <div className="text-xs text-blue-600">Completion Rate</div>
-                      </div>
-                      <div className="h-20 flex-1 rounded-lg bg-gradient-to-br from-green-50 to-emerald-100 p-3">
-                        <div className="h-2 w-16 rounded bg-green-300" />
-                        <div className="mt-2 text-lg font-bold text-green-800">42</div>
-                        <div className="text-xs text-green-600">Courses</div>
-                      </div>
-                    </div>
-                    <div className="rounded-lg bg-gray-50 p-3">
-                      <div className="mb-2 flex items-center gap-2">
-                        <div className="h-6 w-6 rounded-full bg-brand-500 flex items-center justify-center text-xs text-white">🤖</div>
-                        <span className="text-xs font-medium text-gray-700">AI Tutor Active</span>
-                      </div>
-                      <div className="space-y-1">
-                        <div className="rounded bg-white px-2 py-1 text-xs text-gray-600">Can you explain this concept?</div>
-                        <div className="rounded bg-brand-50 px-2 py-1 text-xs text-brand-800">Let me guide you through it step by step...</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        <div style={{ position: "relative", maxWidth: "820px" }}>
+          {/* Badge */}
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: "8px",
+            border: "1px solid rgba(249,115,22,0.35)",
+            background: "rgba(249,115,22,0.08)",
+            borderRadius: "999px", padding: "6px 16px",
+            fontSize: "0.75rem", fontWeight: 600, color: "#fb923c",
+            marginBottom: "28px", backdropFilter: "blur(8px)",
+          }}>
+            <span style={{
+              width: 6, height: 6, borderRadius: "50%",
+              background: "#fb923c", display: "inline-block",
+              boxShadow: "0 0 8px #fb923c",
+            }} />
+            AI-Powered Learning Platform · v1.2
+          </div>
+
+          {/* Headline */}
+          <h1 style={{
+            fontSize: "clamp(2.6rem, 6vw, 4.5rem)",
+            fontWeight: 800, lineHeight: 1.05,
+            letterSpacing: "-0.04em", margin: "0 0 24px",
+            color: "#f8fafc",
+          }}>
+            Train your team at{" "}
+            <span style={{
+              background: "linear-gradient(90deg, #fb923c, #fbbf24)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            }}>lightspeed</span>
+          </h1>
+
+          <p style={{
+            fontSize: "1.15rem", color: "#94a3b8", lineHeight: 1.7,
+            maxWidth: "580px", margin: "0 auto 40px",
+          }}>
+            The AI-first LMS that auto-generates courses, quizzes, and personalized learning paths — powered by a 24/7 Socratic tutor that guides without giving away answers.
+          </p>
+
+          {/* CTAs */}
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+            <Link href="/dashboard" style={{
+              background: "linear-gradient(135deg, #ea580c, #f97316)",
+              color: "#fff", fontWeight: 700, fontSize: "0.9375rem",
+              padding: "14px 32px", borderRadius: "10px", textDecoration: "none",
+              boxShadow: "0 0 32px rgba(249,115,22,0.4)",
+              display: "inline-flex", alignItems: "center", gap: "8px",
+            }}>
+              Start for Free <span>→</span>
+            </Link>
+            <Link href="/dashboard" style={{
+              border: "1px solid rgba(255,255,255,0.1)",
+              background: "rgba(255,255,255,0.04)",
+              color: "#cbd5e1", fontWeight: 600, fontSize: "0.9375rem",
+              padding: "14px 32px", borderRadius: "10px", textDecoration: "none",
+              backdropFilter: "blur(12px)",
+              display: "inline-flex", alignItems: "center", gap: "8px",
+            }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#f87171", display: "inline-block" }} />
+              View Dashboard
+            </Link>
+          </div>
+
+          {/* Social proof */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "20px", marginTop: "40px" }}>
+            <div style={{ display: "flex" }}>
+              {["#8b5cf6","#3b82f6","#10b981","#f97316","#ec4899"].map((c, i) => (
+                <div key={i} style={{
+                  width: 32, height: 32, borderRadius: "50%",
+                  background: c, border: "2px solid #05060f",
+                  marginLeft: i > 0 ? -8 : 0, display: "flex",
+                  alignItems: "center", justifyContent: "center",
+                  fontSize: "0.7rem", fontWeight: 700, color: "#fff",
+                }}>{String.fromCharCode(65 + i)}</div>
+              ))}
             </div>
+            <span style={{ color: "#64748b", fontSize: "0.875rem" }}>
+              Trusted by <strong style={{ color: "#f1f5f9" }}>500+</strong> enterprise teams
+            </span>
           </div>
         </div>
 
-        {/* Wave divider */}
-        <div className="absolute bottom-0 w-full">
-          <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 50C240 100 480 0 720 50C960 100 1200 0 1440 50V100H0V50Z" fill="white" />
-          </svg>
-        </div>
+        {/* Bottom gradient fade */}
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0, height: "120px",
+          background: "linear-gradient(to top, #05060f, transparent)",
+          pointerEvents: "none",
+        }} />
       </section>
 
-      {/* DEMO CONTROLS — remove this block + the import to drop the demo feature */}
-      <DemoControls />
-      {/* END DEMO CONTROLS */}
-
-      {/* ─── FEATURES (P0 + v1.0) ─── */}
-      <section id="features" className="py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-16 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-brand-50 px-4 py-1 text-xs font-semibold text-brand-700">
-              ⚡ Core Platform
-            </div>
-            <h2 className="text-4xl font-extrabold text-gray-900">
-              Everything you need to train at scale
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-500">
-              From course creation to learner analytics — all powered by AI and built on modern infrastructure.
-            </p>
-          </div>
-
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                icon: "📚",
-                title: "Course & Library CRUD",
-                desc: "Create, organize, and manage training courses with rich media support. Full CRUD with real PostgreSQL persistence.",
-                gradient: "from-blue-50 to-blue-100",
-                iconBg: "bg-blue-100 text-blue-600",
-              },
-              {
-                icon: "🎬",
-                title: "Lesson & Video CMS",
-                desc: "Structured lessons with video uploads, rich text content, resource attachments, and drag-and-drop reordering.",
-                gradient: "from-purple-50 to-purple-100",
-                iconBg: "bg-purple-100 text-purple-600",
-              },
-              {
-                icon: "📝",
-                title: "Quiz & Assessment Builder",
-                desc: "Manual quiz creation with multiple question types (MCQ, T/F, short answer, essay). Auto-scoring and feedback.",
-                gradient: "from-amber-50 to-amber-100",
-                iconBg: "bg-amber-100 text-amber-600",
-              },
-              {
-                icon: "📊",
-                title: "Learner Progress Tracking",
-                desc: "Per-learner progress across courses and lessons. Time tracking, completion stats, and score aggregation.",
-                gradient: "from-emerald-50 to-emerald-100",
-                iconBg: "bg-emerald-100 text-emerald-600",
-              },
-            ].map((f, i) => (
-              <div
-                key={i}
-                className={`group relative rounded-2xl border border-gray-100 bg-gradient-to-br ${f.gradient} p-6 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1`}
-              >
-                <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl ${f.iconBg} text-2xl`}>
-                  {f.icon}
-                </div>
-                <h3 className="mb-2 text-lg font-bold text-gray-900">{f.title}</h3>
-                <p className="text-sm leading-relaxed text-gray-600">{f.desc}</p>
-              </div>
+      {/* ── LOGOS BAR ── */}
+      <section style={{ borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "32px 1.5rem", background: "rgba(255,255,255,0.01)" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto", textAlign: "center" }}>
+          <p style={{ color: "#334155", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "20px" }}>
+            Trusted by industry leaders
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "40px" }}>
+            {["Acme Corp", "TechFlow", "DataSphere", "InnovateLabs", "NexusAI", "BuildCo"].map(b => (
+              <span key={b} style={{ color: "#334155", fontWeight: 700, fontSize: "0.9rem", letterSpacing: "0.05em" }}>{b}</span>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── AI FEATURES (P0) ─── */}
-      <section id="ai" className="bg-gray-900 py-24 text-white">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-16 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-brand-900/50 px-4 py-1 text-xs font-semibold text-brand-300 border border-brand-800">
-              🤖 AI-Powered
-            </div>
-            <h2 className="text-4xl font-extrabold text-white">
-              AI that teaches, not just generates
+      {/* ── CORE FEATURES ── */}
+      <section id="features" style={{ padding: "100px 1.5rem" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "60px" }}>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: "6px",
+              border: "1px solid rgba(249,115,22,0.3)", background: "rgba(249,115,22,0.08)",
+              borderRadius: "999px", padding: "5px 14px",
+              fontSize: "0.72rem", fontWeight: 700, color: "#fb923c",
+              letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "20px",
+            }}>⚡ Core Platform</div>
+            <h2 style={{ fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 800, letterSpacing: "-0.03em", color: "#f8fafc", margin: "0 0 16px" }}>
+              Everything you need to<br />
+              <span style={{ background: "linear-gradient(90deg,#fb923c,#fbbf24)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>train at scale</span>
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-400">
-              Our AI doesn't just spit out answers — it guides learners with Socratic questioning, personalized paths, and smart content generation.
+            <p style={{ color: "#64748b", fontSize: "1.05rem", maxWidth: "520px", margin: "0 auto", lineHeight: 1.7 }}>
+              Course creation to learner analytics — AI-powered and built on production-grade infrastructure.
             </p>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-3">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
+            {[
+              { icon: "📚", title: "Course & Library CRUD", desc: "Create, organize and manage training courses with rich media. Full CRUD with real PostgreSQL.", accent: "#3b82f6" },
+              { icon: "🎬", title: "Lesson & Video CMS", desc: "Structured lessons with video uploads, rich text, resource attachments and drag-and-drop reorder.", accent: "#8b5cf6" },
+              { icon: "📝", title: "Quiz & Assessment Builder", desc: "MCQ, T/F, short answer and essay types with auto-scoring, passing thresholds and feedback.", accent: "#f59e0b" },
+              { icon: "📊", title: "Learner Progress Tracking", desc: "Per-learner progress, time tracking, completion stats and score aggregation across all courses.", accent: "#10b981" },
+            ].map((f) => (
+              <GradientCard key={f.title} accent={f.accent}>
+                <div style={{ fontSize: "1.75rem", marginBottom: "16px" }}>{f.icon}</div>
+                <h3 style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#f1f5f9", margin: "0 0 10px" }}>{f.title}</h3>
+                <p style={{ fontSize: "0.8125rem", color: "#64748b", lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
+              </GradientCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── AI PLATFORM ── */}
+      <section id="ai" style={{ padding: "100px 1.5rem", background: "rgba(255,255,255,0.01)", position: "relative", overflow: "hidden" }}>
+        {/* Glow */}
+        <div style={{
+          position: "absolute", top: "50%", left: "50%",
+          transform: "translate(-50%,-50%)",
+          width: "800px", height: "400px", borderRadius: "50%",
+          background: "radial-gradient(ellipse, rgba(249,115,22,0.06) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }} />
+        <div style={{ maxWidth: "1100px", margin: "0 auto", position: "relative" }}>
+          <div style={{ textAlign: "center", marginBottom: "60px" }}>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: "6px",
+              border: "1px solid rgba(249,115,22,0.3)", background: "rgba(249,115,22,0.08)",
+              borderRadius: "999px", padding: "5px 14px",
+              fontSize: "0.72rem", fontWeight: 700, color: "#fb923c",
+              letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "20px",
+            }}>🤖 AI Platform</div>
+            <h2 style={{ fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 800, letterSpacing: "-0.03em", color: "#f8fafc", margin: "0 0 16px" }}>
+              AI that{" "}
+              <span style={{ background: "linear-gradient(90deg,#fb923c,#fbbf24)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>teaches</span>
+              , not just generates
+            </h2>
+            <p style={{ color: "#64748b", fontSize: "1.05rem", maxWidth: "520px", margin: "0 auto", lineHeight: 1.7 }}>
+              Socratic questioning, personalized paths, and smart content generation — never just handing out answers.
+            </p>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: "16px" }}>
             {[
               {
-                icon: "🧑‍🏫",
-                title: "AI Learning Copilot",
-                tag: "P0",
+                icon: "🧑‍🏫", title: "AI Learning Copilot", badge: "P0 — Core",
+                badgeColor: "rgba(249,115,22,0.15)", badgeText: "#fb923c",
+                accent: "#f97316",
                 points: [
                   "24/7 tutor with RAG over course content",
                   "Socratic questioning — hints, not answers",
-                  "Context-aware per lesson/course",
+                  "Context-aware per lesson and course",
                   "Conversation memory per learner",
-                  "Floating chat widget with suggestions",
+                  "Floating chat widget with smart suggestions",
                 ],
-                gradient: "from-brand-500 to-orange-500",
-                delay: "0",
               },
               {
-                icon: "⚡",
-                title: "AI Quiz Generator",
-                tag: "P0",
+                icon: "⚡", title: "AI Quiz Generator", badge: "P0 — Core",
+                badgeColor: "rgba(139,92,246,0.15)", badgeText: "#a78bfa",
+                accent: "#8b5cf6",
                 points: [
-                  "Auto-generate from lesson transcript/text",
-                  "Multiple choice, T/F, short answer types",
-                  "Difficulty levels: easy/medium/hard",
+                  "Auto-generate from lesson transcripts",
+                  "MCQ, True/False, short answer types",
+                  "Easy / medium / hard difficulty levels",
                   "Smart distractor generation",
                   "One-click add to any lesson",
                 ],
-                gradient: "from-purple-500 to-pink-500",
-                delay: "100",
               },
               {
-                icon: "🎯",
-                title: "AI Learning Paths",
-                tag: "P1",
+                icon: "🎯", title: "AI Learning Paths", badge: "P1 — Pro",
+                badgeColor: "rgba(16,185,129,0.15)", badgeText: "#34d399",
+                accent: "#10b981",
                 points: [
-                  "Role & skills-gap based recommendations",
-                  "Career goal alignment",
+                  "Role and skills-gap based recommendations",
+                  "Career goal alignment scoring",
                   "Priority-ranked course suggestions",
                   "Skills gap visualization",
                   "Auto-regenerates as you progress",
                 ],
-                gradient: "from-emerald-500 to-teal-500",
-                delay: "200",
               },
-            ].map((f, i) => (
-              <div
-                key={i}
-                className="relative rounded-2xl border border-gray-800 bg-gray-800/50 p-6 backdrop-blur transition-all hover:border-gray-700 hover:shadow-2xl"
-                style={{ animationDelay: `${f.delay}ms` }}
-              >
-                <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${f.gradient} text-2xl shadow-lg`}>
-                  {f.icon}
+            ].map((f) => (
+              <GradientCard key={f.title} accent={f.accent}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 10,
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "1.4rem", marginBottom: "16px",
+                }}>{f.icon}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+                  <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#f1f5f9", margin: 0 }}>{f.title}</h3>
+                  <span style={{
+                    background: f.badgeColor, color: f.badgeText,
+                    border: `1px solid ${f.badgeText}40`,
+                    borderRadius: "999px", padding: "2px 10px",
+                    fontSize: "0.68rem", fontWeight: 700,
+                  }}>{f.badge}</span>
                 </div>
-                <div className="flex items-center gap-2 mb-3">
-                  <h3 className="text-xl font-bold text-white">{f.title}</h3>
-                  <span className="rounded-full bg-brand-600 px-2 py-0.5 text-[10px] font-bold text-white">{f.tag}</span>
-                </div>
-                <ul className="space-y-2">
-                  {f.points.map((point, j) => (
-                    <li key={j} className="flex items-start gap-2 text-sm text-gray-300">
-                      <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand-400" />
-                      {point}
+                <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {f.points.map((p) => (
+                    <li key={p} style={{ display: "flex", alignItems: "flex-start", gap: "10px", fontSize: "0.8125rem", color: "#64748b" }}>
+                      <span style={{
+                        width: 5, height: 5, borderRadius: "50%",
+                        background: f.accent, flexShrink: 0, marginTop: 6,
+                        boxShadow: `0 0 6px ${f.accent}`,
+                      }} />
+                      {p}
                     </li>
                   ))}
                 </ul>
-              </div>
+              </GradientCard>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── MORE FEATURES (P1) ─── */}
-      <section className="py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-16 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-1 text-xs font-semibold text-amber-700">
-              🚀 Professional Features
-            </div>
-            <h2 className="text-4xl font-extrabold text-gray-900">
-              Enterprise-ready capabilities
+      {/* ── ENTERPRISE ── */}
+      <section id="enterprise" style={{ padding: "100px 1.5rem" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "60px" }}>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: "6px",
+              border: "1px solid rgba(251,191,36,0.3)", background: "rgba(251,191,36,0.08)",
+              borderRadius: "999px", padding: "5px 14px",
+              fontSize: "0.72rem", fontWeight: 700, color: "#fbbf24",
+              letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "20px",
+            }}>🚀 Enterprise</div>
+            <h2 style={{ fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 800, letterSpacing: "-0.03em", color: "#f8fafc", margin: "0 0 16px" }}>
+              Enterprise-ready{" "}
+              <span style={{ background: "linear-gradient(90deg,#fbbf24,#f97316)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>capabilities</span>
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-500">
-              Live sessions, certifications, badges, and skills assessments for the complete learning lifecycle.
+            <p style={{ color: "#64748b", fontSize: "1.05rem", maxWidth: "520px", margin: "0 auto", lineHeight: 1.7 }}>
+              Live sessions, certifications, badges, SCORM compliance, and skills assessments for the full learning lifecycle.
             </p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: "12px" }}>
             {[
-              { icon: "🔴", title: "Live Sessions & Webinars", desc: "Schedule, record, and transcribe live training with Zoom/Jitsi integration." },
-              { icon: "📜", title: "Certifications", desc: "Auto-issue PDF certificates upon completion with expiry tracking." },
-              { icon: "🏅", title: "Badges & Achievements", desc: "5 badge types: completion, excellence, speed, streak, and mentor." },
-              { icon: "📐", title: "Skills Gap Analysis", desc: "Pre/post assessments with improvement tracking and radar charts." },
-              { icon: "🎥", title: "AI Video Summaries", desc: "Auto-generated summaries, chapter markers, and searchable transcripts." },
-              { icon: "💬", title: "Discussion Forums", desc: "Course-specific forums with AI moderation and auto-replies." },
-              { icon: "📦", title: "SCORM/xAPI Ready", desc: "Import/export SCORM packages. Track via xAPI statements." },
-              { icon: "🐳", title: "Docker + Helm Deploy", desc: "Containerized with Kubernetes support. CI/CD with GitHub Actions." },
-            ].map((f, i) => (
-              <div key={i} className="group rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-brand-200">
-                <div className="mb-3 text-2xl">{f.icon}</div>
-                <h3 className="mb-1 font-bold text-gray-900 text-sm">{f.title}</h3>
-                <p className="text-xs leading-relaxed text-gray-500">{f.desc}</p>
+              { icon: "🔴", title: "Live Sessions", desc: "Schedule, record, and transcribe live training with Zoom/Jitsi.", accent: "#ef4444" },
+              { icon: "📜", title: "Certifications", desc: "Auto-issue PDF certificates on completion with expiry tracking.", accent: "#f59e0b" },
+              { icon: "🏅", title: "Badges & Achievements", desc: "5 badge types: completion, excellence, speed, streak, mentor.", accent: "#f97316" },
+              { icon: "📐", title: "Skills Gap Analysis", desc: "Pre/post assessments with radar charts and improvement tracking.", accent: "#8b5cf6" },
+              { icon: "🎥", title: "AI Video Summaries", desc: "Auto-generated chapter markers, summaries and transcripts.", accent: "#3b82f6" },
+              { icon: "💬", title: "Discussion Forums", desc: "Course forums with AI moderation and auto Q&A responses.", accent: "#10b981" },
+              { icon: "📦", title: "SCORM / xAPI", desc: "Import/export SCORM packages. Track via xAPI statements.", accent: "#14b8a6" },
+              { icon: "🐳", title: "Docker + Helm", desc: "Containerized, Kubernetes-ready, CI/CD and self-hostable.", accent: "#0ea5e9" },
+            ].map((f) => (
+              <GradientCard key={f.title} accent={f.accent} small>
+                <div style={{ fontSize: "1.5rem", marginBottom: "12px" }}>{f.icon}</div>
+                <h3 style={{ fontSize: "0.875rem", fontWeight: 700, color: "#f1f5f9", margin: "0 0 6px" }}>{f.title}</h3>
+                <p style={{ fontSize: "0.78rem", color: "#64748b", lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
+              </GradientCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── STATS ── */}
+      <section style={{ padding: "80px 1.5rem", position: "relative", overflow: "hidden" }}>
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(135deg, rgba(234,88,12,0.08) 0%, rgba(251,191,36,0.04) 50%, rgba(234,88,12,0.08) 100%)",
+          borderTop: "1px solid rgba(249,115,22,0.12)",
+          borderBottom: "1px solid rgba(249,115,22,0.12)",
+        }} />
+        <div style={{ maxWidth: "900px", margin: "0 auto", position: "relative" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: "32px", textAlign: "center" }}>
+            {[
+              { value: "55+", label: "API Endpoints", sub: "Production-grade REST" },
+              { value: "17", label: "Data Models", sub: "Complete schema coverage" },
+              { value: "99.9%", label: "Uptime SLA", sub: "Enterprise reliability" },
+              { value: "30+", label: "Test Cases", sub: "Fully tested backend" },
+            ].map((s) => (
+              <div key={s.label}>
+                <div style={{
+                  fontSize: "clamp(2.5rem,5vw,3.5rem)", fontWeight: 900,
+                  background: "linear-gradient(90deg,#fb923c,#fbbf24)",
+                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                  lineHeight: 1, letterSpacing: "-0.04em",
+                }}>{s.value}</div>
+                <div style={{ fontSize: "0.9375rem", fontWeight: 700, color: "#e2e8f0", margin: "6px 0 4px" }}>{s.label}</div>
+                <div style={{ fontSize: "0.78rem", color: "#475569" }}>{s.sub}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── STATS ─── */}
-      <section className="bg-gradient-to-r from-brand-600 to-orange-500 py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="grid grid-cols-2 gap-8 text-center lg:grid-cols-4">
-            {[
-              { value: "55+", label: "API Endpoints" },
-              { value: "17", label: "Data Models" },
-              { value: "99.9%", label: "Uptime SLA" },
-              { value: "30+", label: "Test Cases" },
-            ].map((s, i) => (
-              <div key={i}>
-                <div className="text-4xl font-extrabold text-white">{s.value}</div>
-                <div className="mt-1 text-sm font-medium text-orange-100">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── TECH STACK ─── */}
-      <section className="py-24 bg-gray-50">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-16 text-center">
-            <h2 className="text-4xl font-extrabold text-gray-900">Built on Modern Stack</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-500">
-              Production-grade architecture designed for scale and reliability.
+      {/* ── TECH STACK ── */}
+      <section style={{ padding: "100px 1.5rem", background: "rgba(255,255,255,0.01)" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "56px" }}>
+            <h2 style={{ fontSize: "clamp(1.75rem,3.5vw,2.5rem)", fontWeight: 800, letterSpacing: "-0.03em", color: "#f8fafc", margin: "0 0 12px" }}>
+              Built on Modern Stack
+            </h2>
+            <p style={{ color: "#64748b", fontSize: "1rem", maxWidth: "420px", margin: "0 auto" }}>
+              Production-grade architecture built for scale and developer experience.
             </p>
           </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: "16px" }}>
             {[
-              { name: "FastAPI", role: "Backend", desc: "Python async framework with auto OpenAPI docs", color: "bg-teal-100 text-teal-700" },
-              { name: "Next.js 14", role: "Frontend", desc: "App Router + Server Components", color: "bg-gray-900 text-white" },
-              { name: "PostgreSQL", role: "Database", desc: "Async SQLAlchemy 2.0 + Alembic migrations", color: "bg-blue-100 text-blue-700" },
-              { name: "Docker", role: "Infrastructure", desc: "Containerized with Helm + Kubernetes", color: "bg-sky-100 text-sky-700" },
-            ].map((t, i) => (
-              <div key={i} className="rounded-xl border border-gray-200 bg-white p-6 text-center shadow-sm">
-                <span className={`inline-block rounded-lg px-3 py-1 text-xs font-bold mb-3 ${t.color}`}>{t.role}</span>
-                <h3 className="text-lg font-bold text-gray-900">{t.name}</h3>
-                <p className="mt-1 text-sm text-gray-500">{t.desc}</p>
-              </div>
+              { name: "FastAPI", role: "Backend", desc: "Python async framework. 55+ routes, auto OpenAPI docs, Alembic migrations.", accent: "#14b8a6" },
+              { name: "Next.js 14", role: "Frontend", desc: "App Router + Server Components. TypeScript-first, mobile-responsive.", accent: "#e2e8f0" },
+              { name: "PostgreSQL", role: "Database", desc: "Async SQLAlchemy 2.0 + Alembic. 17 models with full relationship graphs.", accent: "#3b82f6" },
+              { name: "Docker + K8s", role: "Infrastructure", desc: "Helm charts, cloud-native, CI/CD-ready and self-hostable.", accent: "#0ea5e9" },
+            ].map((t) => (
+              <GradientCard key={t.name} accent={t.accent}>
+                <div style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#475569", marginBottom: "8px" }}>{t.role}</div>
+                <div style={{ fontSize: "1.5rem", fontWeight: 800, color: t.accent, marginBottom: "12px", letterSpacing: "-0.02em" }}>{t.name}</div>
+                <p style={{ fontSize: "0.8125rem", color: "#64748b", lineHeight: 1.6, margin: 0 }}>{t.desc}</p>
+              </GradientCard>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── CTA ─── */}
-      <section id="pricing" className="py-24">
-        <div className="mx-auto max-w-4xl px-6 text-center">
-          <h2 className="text-4xl font-extrabold text-gray-900">
-            Ready to transform your training?
+      {/* ── CTA ── */}
+      <section id="pricing" style={{ padding: "120px 1.5rem", textAlign: "center", position: "relative", overflow: "hidden" }}>
+        <div style={{
+          position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
+          width: "700px", height: "400px",
+          background: "radial-gradient(ellipse, rgba(249,115,22,0.1) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }} />
+        <div style={{ position: "relative", maxWidth: "640px", margin: "0 auto" }}>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: "6px",
+            border: "1px solid rgba(249,115,22,0.3)", background: "rgba(249,115,22,0.08)",
+            borderRadius: "999px", padding: "5px 14px",
+            fontSize: "0.72rem", fontWeight: 700, color: "#fb923c",
+            letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "28px",
+          }}>🎉 Free &amp; Open Source</div>
+          <h2 style={{ fontSize: "clamp(2rem,4vw,3.25rem)", fontWeight: 800, letterSpacing: "-0.04em", color: "#f8fafc", margin: "0 0 20px" }}>
+            Ready to transform<br />
+            <span style={{ background: "linear-gradient(90deg,#fb923c,#fbbf24)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              your training?
+            </span>
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-gray-500">
-            Open source. Self-hosted. AI-powered. Start training your team today.
+          <p style={{ color: "#64748b", fontSize: "1.05rem", maxWidth: "460px", margin: "0 auto 40px", lineHeight: 1.7 }}>
+            Self-hosted, open source, AI-powered. Start training your team today — no credit card required.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link
-              href="/dashboard"
-              className="rounded-xl bg-brand-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-brand-200 hover:bg-brand-700 transition-all"
-            >
-              Launch Dashboard →
-            </Link>
-            <a
-              href="https://github.com/dclawstack/dclaw-train"
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-xl border border-gray-300 bg-white px-8 py-4 text-base font-semibold text-gray-700 hover:bg-gray-50 transition-all"
-            >
-              View on GitHub
-            </a>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+            <Link href="/dashboard" style={{
+              background: "linear-gradient(135deg,#ea580c,#f97316)",
+              color: "#fff", fontWeight: 700, fontSize: "0.9375rem",
+              padding: "14px 32px", borderRadius: "10px", textDecoration: "none",
+              boxShadow: "0 0 32px rgba(249,115,22,0.4)",
+              display: "inline-flex", alignItems: "center", gap: "8px",
+            }}>Launch Dashboard →</Link>
+            <a href="#" style={{
+              border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)",
+              color: "#94a3b8", fontWeight: 600, fontSize: "0.9375rem",
+              padding: "14px 32px", borderRadius: "10px", textDecoration: "none",
+              backdropFilter: "blur(12px)",
+              display: "inline-flex", alignItems: "center", gap: "8px",
+            }}>⭐ View on GitHub</a>
           </div>
-          <p className="mt-6 text-sm text-gray-400">
-            Free and open source. No credit card required.
-          </p>
+          <p style={{ marginTop: "20px", fontSize: "0.8125rem", color: "#334155" }}>MIT License · Self-hostable · Open Source</p>
         </div>
       </section>
 
-      {/* ─── FOOTER ─── */}
-      <footer className="border-t border-gray-100 bg-gray-50 py-12">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      {/* ── FOOTER ── */}
+      <footer style={{ borderTop: "1px solid rgba(255,255,255,0.05)", padding: "60px 1.5rem 32px", background: "#030509" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: "40px", marginBottom: "48px" }}>
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">🚂</span>
-                <span className="font-bold text-gray-900">DClaw Train</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+                <div style={{ width: 28, height: 28, borderRadius: 7, background: "linear-gradient(135deg,#f97316,#fb923c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.9rem" }}>🚂</div>
+                <span style={{ fontWeight: 700, color: "#f1f5f9" }}>DClaw <span style={{ color: "#fb923c" }}>Train</span></span>
               </div>
-              <p className="text-sm text-gray-500">AI-powered learning management system. Built on the DClaw Stack.</p>
-            </div>
-            <div>
-              <h4 className="mb-3 text-sm font-bold text-gray-900">Product</h4>
-              <div className="space-y-1 text-sm text-gray-500">
-                <p>AI Tutor</p>
-                <p>Course Builder</p>
-                <p>Quiz Generator</p>
-                <p>Analytics</p>
-              </div>
-            </div>
-            <div>
-              <h4 className="mb-3 text-sm font-bold text-gray-900">Resources</h4>
-              <div className="space-y-1 text-sm text-gray-500">
-                <p>Documentation</p>
-                <p>API Reference</p>
-                <p>GitHub</p>
-                <p>Docker Hub</p>
+              <p style={{ color: "#334155", fontSize: "0.8125rem", lineHeight: 1.7, maxWidth: "200px" }}>
+                AI-powered LMS. Built on the DClaw Stack.
+              </p>
+              <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
+                {["GitHub", "Twitter"].map(s => (
+                  <a key={s} href="#" style={{
+                    border: "1px solid rgba(255,255,255,0.07)", background: "rgba(255,255,255,0.03)",
+                    color: "#475569", fontSize: "0.75rem", fontWeight: 600,
+                    padding: "5px 12px", borderRadius: "6px", textDecoration: "none",
+                  }}>{s}</a>
+                ))}
               </div>
             </div>
             <div>
-              <h4 className="mb-3 text-sm font-bold text-gray-900">Contact</h4>
-              <div className="space-y-1 text-sm text-gray-500">
-                <p>Ramsai Kamavaram</p>
-                <p className="text-brand-600">kamavaram.ramsai@gmail.com</p>
-                <p>Built on DClaw Stack</p>
+              <h4 style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#f1f5f9", marginBottom: "16px" }}>Product</h4>
+              {["AI Tutor","Course Builder","Quiz Generator","Analytics","Live Sessions","Certifications"].map(i => (
+                <p key={i} style={{ color: "#334155", fontSize: "0.8125rem", marginBottom: "8px", cursor: "pointer" }}>{i}</p>
+              ))}
+            </div>
+            <div>
+              <h4 style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#f1f5f9", marginBottom: "16px" }}>Resources</h4>
+              {["Documentation","API Reference","GitHub","Docker Hub","Changelog"].map(i => (
+                <p key={i} style={{ color: "#334155", fontSize: "0.8125rem", marginBottom: "8px", cursor: "pointer" }}>{i}</p>
+              ))}
+            </div>
+            <div>
+              <h4 style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#f1f5f9", marginBottom: "16px" }}>Contact</h4>
+              <p style={{ color: "#f1f5f9", fontSize: "0.875rem", fontWeight: 600, marginBottom: "6px" }}>Ramsai Kamavaram</p>
+              <a href="mailto:kamavaram.ramsai@gmail.com" style={{ color: "#fb923c", fontSize: "0.8125rem", textDecoration: "none" }}>
+                kamavaram.ramsai@gmail.com
+              </a>
+              <div style={{
+                marginTop: "16px", display: "inline-flex", alignItems: "center", gap: "7px",
+                border: "1px solid rgba(16,185,129,0.3)", background: "rgba(16,185,129,0.08)",
+                borderRadius: "999px", padding: "4px 12px",
+                fontSize: "0.72rem", fontWeight: 600, color: "#34d399",
+              }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#34d399", boxShadow: "0 0 8px #34d399" }} />
+                All systems operational
               </div>
             </div>
           </div>
-          <div className="mt-10 border-t border-gray-200 pt-6 text-center text-xs text-gray-400">
-            © {new Date().getFullYear()} DClaw Train. Open source under MIT License.
+
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.04)", paddingTop: "24px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+            <p style={{ color: "#1e293b", fontSize: "0.78rem" }}>© {new Date().getFullYear()} DClaw Train. Open source under MIT License.</p>
+            <div style={{ display: "flex", gap: "20px" }}>
+              {["Privacy Policy","Terms of Service","Security"].map(l => (
+                <a key={l} href="#" style={{ color: "#1e293b", fontSize: "0.78rem", textDecoration: "none" }}>{l}</a>
+              ))}
+            </div>
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function GradientCard({ children, accent, small }: { children: React.ReactNode; accent: string; small?: boolean }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        position: "relative", borderRadius: "14px",
+        padding: "1px",
+        background: hovered
+          ? `linear-gradient(135deg, ${accent}60, rgba(255,255,255,0.08))`
+          : "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
+        transition: "all 0.3s ease",
+        transform: hovered ? "translateY(-2px)" : "none",
+        boxShadow: hovered ? `0 16px 40px rgba(0,0,0,0.4), 0 0 30px ${accent}15` : "0 4px 20px rgba(0,0,0,0.2)",
+      }}
+    >
+      <div style={{
+        borderRadius: "13px",
+        background: hovered ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.02)",
+        backdropFilter: "blur(8px)",
+        padding: small ? "20px" : "24px",
+        height: "100%",
+        transition: "background 0.3s",
+      }}>
+        {children}
+      </div>
     </div>
   );
 }
