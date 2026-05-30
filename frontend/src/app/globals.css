@@ -57,3 +57,85 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Landing page specific */
+.landing-card {
+  background:
+    linear-gradient(#0d0d14, #0d0d14) padding-box,
+    linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%) border-box;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.landing-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  background:
+    linear-gradient(#0d0d14, #0d0d14) padding-box,
+    linear-gradient(135deg, rgba(249,115,22,0.3) 0%, rgba(255,255,255,0.05) 100%) border-box;
+}
+
+.landing-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 12px 28px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(234,88,12,0.5), 0 4px 24px rgba(249,115,22,0.3);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.landing-btn-primary:hover {
+  box-shadow: 0 0 0 1px rgba(234,88,12,0.8), 0 4px 32px rgba(249,115,22,0.5);
+  transform: translateY(-1px);
+}
+
+.landing-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.04);
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 12px 28px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.landing-btn-ghost:hover {
+  background: rgba(255,255,255,0.08);
+  color: #e2e8f0;
+}
+
+.section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #f97316;
+  background: rgba(249,115,22,0.08);
+  border: 1px solid rgba(249,115,22,0.2);
+  border-radius: 999px;
+  padding: 4px 14px;
+  margin-bottom: 20px;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #f97316 0%, #fbbf24 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
